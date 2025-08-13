@@ -6,7 +6,7 @@ services:
     container_name: fastapi_image_pipeline
     restart: always
     ports:
-      - "8080:8080"
+      - "8086:8080"
     volumes:
       - ./originalzip:/app/originalzip
       - ./resized:/app/resized
