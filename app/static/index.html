@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Image Pipeline</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
+    .bar { height: 16px; background: #eee; border-radius: 8px; overflow: hidden; width: 400px; }
+    .fill { height: 100%; width: 0%; background: #4f46e5; transition: width .2s ease; }
+    .row { margin: .75rem 0; }
+    .muted { color: #666; font-size: .9rem; }
+    button { padding: .5rem 1rem; background:#111827; color:#fff; border-radius: .5rem; border:0; cursor:pointer; }
+    input[type="number"] { width: 120px; }
+  </style>
+</head>
+<body>
+  <h1>Image Processor</h1>
+
+  <form id="form">
+    <div class="row">
+      <label>Zip file: <input type="file" name="zipfile_upload" required /></label>
+    </div>
+    <div class="row">
+      <label>Canvas size (e.g. 1550): <input type="number" name="size" value="1550" required /></label>
+    </div>
+    <div class="row">
+      <label>Max dimension (e.g. 1200): <input type="number" name="resize" value="1200" required /></label>
+    </div>
+    <div class="row"><button type="submit">Start</button></div>
+  </form>
+
+  <div id="status" class="row muted">Idle</div>
+  <div class="bar"><div id="fill" class="fill"></div></div>
+  <div id="counts" class="row muted"></div>
+  <div id="link" class="row"></div>
+
+  <script>
+    const form = document.getElementById('form');
+    const statusEl = document.getElementById('status');
+    const fill = document.getElementById('fill');
+    const counts = document.getElementById('counts');
+    const link = document.getElementById('link');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      link.innerHTML = '';
+      fill.style.width = '0%';
+      statusEl.textContent = 'Uploading...';
+
+      const fd = new FormData(form);
+      const res = await fetch('/jobs', { method: 'POST', body: fd });
+      if (!res.ok) {
+        statusEl.textContent = 'Failed to start job.';
+        return;
+      }
+      const { job_id } = await res.json();
+      statusEl.textContent = `Job ${job_id} started.`;
+
+      const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+      const ws = new WebSocket(`${proto}://${location.host}/ws/${job_id}`);
+
+      ws.onmessage = (ev) => {
+        const data = JSON.parse(ev.data);
+        if (data.error) {
+          statusEl.textContent = 'Error: ' + data.error;
+          return;
+        }
+        statusEl.textContent = `Status: ${data.status} (${data.phase})`;
+        fill.style.width = (data.progress || 0) + '%';
+        counts.textContent = (data.total > 0)
+          ? `Processed ${data.processed}/${data.total}`
+          : `Processed ${data.processed}`;
+
+        if (data.download_url) {
+          link.innerHTML = `<a href="${data.download_url}">Download ZIP</a>`;
+        }
+      };
+      ws.onclose = () => {
+        // keep as-is
+      };
+    });
+  </script>
+</body>
+</html>

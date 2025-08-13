@@ -1,0 +1,15 @@
+version: "3.9"
+
+services:
+  api:
+    build: .
+    container_name: fastapi_image_pipeline
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./originalzip:/app/originalzip
+      - ./resized:/app/resized
+      - ./resizedzip:/app/resizedzip
+    environment:
+      - PYTHONUNBUFFERED=1
