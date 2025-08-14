@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Image Pipeline</title>
+  <title>Picresize</title>
   <style>
     body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; margin: 2rem; }
     .bar { height: 16px; background: #eee; border-radius: 8px; overflow: hidden; width: 400px; }
@@ -14,17 +14,17 @@
   </style>
 </head>
 <body>
-  <h1>Image Processor</h1>
+  <h1>PicResize 🖼️</h1>
 
   <form id="form">
     <div class="row">
       <label>Zip file: <input type="file" name="zipfile_upload" required /></label>
     </div>
     <div class="row">
-      <label>Canvas size (e.g. 1550): <input type="number" name="size" value="1550" required /></label>
+      <label>Canvas (e.g. 1800): <input type="number" name="size" value="1550" required /></label>
     </div>
     <div class="row">
-      <label>Max dimension (e.g. 1200): <input type="number" name="resize" value="1200" required /></label>
+      <label>Lato maggiore (e.g. 1550): <input type="number" name="resize" value="1200" required /></label>
     </div>
     <div class="row"><button type="submit">Start</button></div>
   </form>
