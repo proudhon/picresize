@@ -37,8 +37,12 @@ app.mount(
 
 @app.get("/", response_class=HTMLResponse)
 def index():
-    # Simple link to the demo UI
-    return '<!doctype html><html><body><a href="/static/index.html">Open uploader</a></body></html>'
+    index_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
+    if os.path.exists(index_path):
+        with open(index_path, "r", encoding="utf-8") as f:
+            content = f.read()
+        return HTMLResponse(content)
+    return HTMLResponse("<h1>index.html not found</h1>", status_code=404)
 
 
 @app.post("/jobs")
