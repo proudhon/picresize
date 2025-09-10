@@ -4,7 +4,8 @@ rm ./resized/* -f || true
 unzip -q ./originalzip/*.zip -d ./original/
 rm ./originalzip/* || true
 ZIPFILE=./resizedzip/output-$(date +%Y-%m-%d-%H:%M).zip
-convert -size "$1"x"$1" canvas:white "canvas.jpeg"
+#convert -size "$1"x"$1" canvas:white "canvas.jpeg"
+#convert -size "$1"x"$1" xc:white -colorspace sRGB "canvas.jpeg"
 for image in ./original/*; do
   # Process only files (skip subdirectories if any)
   if [ -f "$image" ]; then
@@ -34,8 +35,9 @@ for image in ./original/*; do
     fi
 
     # Composite the (resized) image onto the center of the white canvas
-    convert canvas.jpeg "$tmp_image" -gravity center -composite "./resized/$filename"
-
+    #    convert canvas.jpeg "$tmp_image" -gravity center -composite "./resized/$filename"
+    convert -size "$1"x"$1" xc:white "$tmp_image" -gravity center -composite -colorspace sRGB "./resized/$filename"
+    #    convert canvas.jpeg "$tmp_image" -gravity center -composite -colorspace sRGB "./resized/$filename"
     rm "$tmp_image"
     echo "Processed: $filename"
   fi
